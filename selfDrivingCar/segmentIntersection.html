@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<head>
+    <title>Segment Intesection</title>
+    <style>
+        body{
+            margin:0;
+            overflow:hidden;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="myCanvas"></canvas>
+    <script>
+    const ctx=myCanvas.getContext("2d");
+    myCanvas.width=window.innerWidth;
+    myCanvas.height=window.innerHeight;
+
+    const A={x:200,y:150};
+    const B={x:100,y:250};
+    const C={x:50,y:100};
+    const D={x:250,y:200};
+
+    let t=-.5;
+
+    animate();
+
+    function animate(){
+    const M={
+    x:lerp(A.x,B.x,t),
+    y:lerp(A.y,B.y,t)
+    }
+    ctx.clearRect(0,0,myCanvas.width,myCanvas.height);
+    ctx.beginPath();
+    ctx.moveTo(A.x,A.y);
+    ctx.lineTo(B.x,B.y);
+    ctx.moveTo(C.x,C.y);
+    ctx.lineTo(D.x,D.y);
+    ctx.stroke();
+
+    drawDot(A,'A');
+    drawDot(B,'B');
+    drawDot(C,'C');
+    drawDot(D,'D');
+    drawDot(M,'M',t<0||t>1);
+    if(t>1.5){
+        t=-.5
+    }
+    else{
+        t+=0.01
+    }
+    requestAnimationFrame(animate);
+    }
+    
+    
+    function drawDot(point,label, isRed){
+    ctx.beginPath();
+    ctx.fillStyle=isRed?"red":"white";
+    ctx.arc(point.x,point.y,10,0,2*Math.PI)
+    ctx.fill();
+    ctx.stroke();
+    ctx.fillStyle="black";
+    ctx.textAlign='center';
+    ctx.textBaseline='middle';
+    ctx.font="bold 14px Arial";
+    ctx.fillText(label,point.x,point.y);
+    }
+
+
+    function lerp(A,B,t){
+        return A+(B-A)*t;
+    }
+    
+
+    </script>
+</body>
+</html>

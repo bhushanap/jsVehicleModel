@@ -12,23 +12,29 @@ class Sensors{
     update(borders){
         this.#castRays();
         this.readings=[];
-        for(let i=0;this.rays.length;i++){
+        for(let i=0;i<this.rays.length;i++){
+            // console.log(this.#getReading(this.rays[i],borders))
             this.readings.push(
-                this.getReading(this.rays[i],borders)
+                this.#getReading(this.rays[i],borders)
             );
         }
 
     }
 
-    getReading(ray,borders){
+    #getReading(ray,borders){
         let touches=[];
+        // console.log(borders.length)
         for(let i=0;i<borders.length;i++){
             const touch=getIntersection(
                 ray[0],ray[1],borders[i][0],borders[i][1]
             );
+
             if(touch){
                 touches.push(touch);
             }
+        
+        }
+        // console.log(touches);
         if(touches.length==0){
             return null;
         }
@@ -37,10 +43,10 @@ class Sensors{
             const minOffset=Math.min(...offsets);
             return touches.find(e=>e.offset==minOffset);
         }
-        }
+        
     }
 
-    castRays(){
+    #castRays(){
         this.rays=[];
         for(let i=0;i<this.rayCount;i++){
             const rayAngle=lerp(this.raySpread/2,

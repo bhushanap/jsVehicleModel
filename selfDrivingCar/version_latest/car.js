@@ -29,6 +29,25 @@ class Car{
     }
 
     update(borders){
+        this.#move();
+
+        this.calcfric();
+        this.saturate();
+        
+        
+        this.updatevec();
+        this.sensor.update(borders);
+        this.saturate();
+        this.carAngle+=this.carSteer;
+
+        this.saturate();
+
+        this.y-=this.spd * Math.cos(this.carAngle);
+        this.x-=this.spd * Math.sin(this.carAngle);
+        
+    }
+
+    #move(){
         if(this.controls.forward){
             this.spd+=this.acc;
         }
@@ -47,21 +66,6 @@ class Car{
         if(this.controls.right==false && this.controls.left==false){
             this.angle-=this.angle*0.1;
         }
-
-        this.calcfric();
-        this.saturate();
-        
-        
-        this.updatevec();
-        this.sensor.update(borders);
-        this.saturate();
-        this.carAngle+=this.carSteer;
-
-        this.saturate();
-
-        this.y-=this.spd * Math.cos(this.carAngle);
-        this.x-=this.spd * Math.sin(this.carAngle);
-        
     }
 
     updatevec(){

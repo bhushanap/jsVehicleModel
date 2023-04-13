@@ -12,6 +12,7 @@ class Truck{
         this.ty = this.cy+((this.clength+this.tlength)/2)+this.gap;  
         this.cAngle = 0;
         this.tAngle = this.cAngle;
+        this.tomega = 0;
         this.controls=new Controls();
 
         this.steerAngle=0;
@@ -35,6 +36,7 @@ class Truck{
         this.calpha=0;
         this.comega=0;
         this.cmoi=10;
+        this.tmoi=10000;
     }
 
 
@@ -93,7 +95,7 @@ class Truck{
         this.car=this.#createCar();
         this.trailer= this.#createTrailer();
         this.updateTrailer();
-        console.log(this.cvel)
+        // console.log(this.cvel)
         // console.log(this.cft, this.cff, this.cffAngle, this.cfx, this.cfy);
         
     }
@@ -150,7 +152,7 @@ class Truck{
         this.cveld = (mag) * Math.cos(angleH)
         if(this.steerAngle!=0){
             this.r = this.clength/Math.tan(Math.abs(this.steerAngle)) + this.width/2
-            this.ctor += Math.abs(this.cveld**1)/this.r * Math.sign(this.steerAngle);
+            this.ctor += (this.cveld**1)/this.r * Math.sign(this.steerAngle);
             
         }
         // this.cf+=0.03*this.cveld
@@ -179,7 +181,12 @@ class Truck{
     updateTrailer(){
         this.mx = this.cx+(this.gap+this.clength/2)*Math.sin(this.cAngle);
         this.my = this.cy+(this.gap+this.clength/2)*Math.cos(this.cAngle);
-        this.tAngle += Math.sin(wrap(this.cAngle-this.tAngle))*this.cf*(this.tlength/2)/1000
+        if(Math.abs(this.cvely)<0.01) {this.vAngle = this.tAngle}
+        else{this.vAngle = Math.atan2(-this.cvelx,-this.cvely)}
+        this.tomega += ((Math.sin(wrap(this.vAngle-this.tAngle))*(this.tlength/2))*Math.abs(this.cveld) - this.tomega*10000) * (1/this.tmoi)
+        
+        this.tAngle += this.tomega;
+        console.log(this.cveld)
         this.tx = this.mx+(this.tlength/2)*Math.sin(this.tAngle);
         this.ty = this.my+(this.tlength/2)*Math.cos(this.tAngle);
     }
@@ -192,17 +199,23 @@ class Truck{
         }
         ctx.fill()
         
-        // ctx.beginPath();
-        // ctx.moveTo(this.trailer[0].x,this.trailer[0].y);
-        // for(let i=1;i<this.trailer.length;i++){
-        //     ctx.lineTo(this.trailer[i].x,this.trailer[i].y);
-        // }
-        // ctx.fill()
+        ctx.beginPath();
+        ctx.moveTo(this.trailer[0].x,this.trailer[0].y);
+        for(let i=1;i<this.trailer.length;i++){
+            ctx.lineTo(this.trailer[i].x,this.trailer[i].y);
+        }
+        ctx.fill()
 
         ctx.beginPath();
         ctx.arc(this.mx, this.my, 5, 0, 2 * Math.PI);
         ctx.fillStyle = "red";
         ctx.fill();
+
+        ctx.beginPath();
+        ctx.moveTo(100, 100);
+        ctx.lineTo(100-(Math.sin(wrap(this.vAngle-this.tAngle)))*30, 100-(Math.cos(wrap(this.vAngle-this.tAngle)))*30);
+        
+        ctx.stroke();
     }
 }
 

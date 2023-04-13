@@ -10,7 +10,7 @@ class Truck{
         this.my=0;
         this.tx = this.cx;
         this.ty = this.cy+((this.clength+this.tlength)/2)+this.gap;  
-        this.cAngle = 0;
+        this.cAngle = 0.785;
         this.tAngle = this.cAngle;
         this.controls=new Controls();
 
@@ -21,20 +21,23 @@ class Truck{
 
         this.fAngle = this.cAngle+this.steerAngle;
 
-        this.maxfric=0.01;
-        this.maxcf=0.05;
-        this.dcf=0.002;
-        this.cf=0;
-        this.cacc=0;
+        this.cH = new Vector(-1,-1);
+        this.sH = this.cH.rot(this.steerAngle)
+        this.cforce = new Vector(0,0);
+        this.cfricf = new Vector(0,0);
+        this.cfricr = new Vector(0,0);
+        this.cacc = new Vector(0,0);
+        this.cvel = new Vector(0,0);
+
+        this.cf=0.1;
+        this.rfric=-0.005;
+        this.sfric=-0.00;
+        
         this.cmass=1;
-        this.caccx=0;
-        this.caccy=0;
-        this.cvelx=0;
-        this.cvely=0;
         this.ctor=0;
         this.calpha=0;
         this.comega=0;
-        this.cmoi=10;
+        this.cmoi=30;
     }
 
 
@@ -84,33 +87,64 @@ class Truck{
     }
 
     update(){
-        // console.log(this.cvelx, this.cffAngle, this.vAngle, this.cfAngle, this.cAngle);
+        // initialize vectors
+
+        // vehicle head unit
+        // steer head unit
+        // steer angle unit
+        // f
+        // a
+        // v
+
+        // a = 0
+        // sh = vh + sa
+        // forward
+        // f += sh * k1
+
+
+        // fsh -= v perp sh  * k2
+        // fsh -= v proj sh  * k3
+
+        // fvh -= v proj vh  * k3
+        // fvh -= v perp vh  * k2
+
+        // ang = angdiff fsh vh
+        // fsh * wb/2 * sin(angdiff)
         this.updateControls();
+        
         this.saturate();
-        this.friction();
+        
+        // this.friction();
         this.dynamics();
+        // this.saturate();
+        
         this.move();
+        
+        
         this.car=this.#createCar();
         this.trailer= this.#createTrailer();
         this.updateTrailer();
-        console.log(this.cvel)
+        
         // console.log(this.cft, this.cff, this.cffAngle, this.cfx, this.cfy);
         
     }
 
     updateControls(){
         if(this.controls.forward){
-            this.cf+=this.dcf;
+            this.cforce = this.sH.scale(this.cf);
         }
         else{
-            this.cf-=this.cf*0.05;
+            this.cforce = new Vector(0,0);
         }
         if(this.controls.reverse){
-            this.cf-=this.maxcf*0.1;
+            this.cforce = this.sH.scale(this.cf*-0.5);
         }
-        // if(this.controls.brake){
-        //     this.cf=this.maxcf;
-        // }
+        if(this.controls.brake){
+            this.rfric = -0.05;
+        }
+        else{
+            this.rfric = -0.005;
+        }
         if(this.controls.left){
             this.steerAngle+=this.dsteerAngle;
         }
@@ -131,49 +165,54 @@ class Truck{
         if(Math.abs(this.steerAngle)>this.maxsteerAngle){
             this.steerAngle *= this.maxsteerAngle/Math.abs(this.steerAngle);
         }
-        if(Math.abs(this.cf)>this.maxcf){
-            this.cf *= this.maxcf/Math.abs(this.cf);
-        }
-    }
 
-    friction(){
+        if(this.cvel.mag()<0.001){
+            this.cvel = new Vector(0,0);
+        }
+        // if(this.comega<0.001){
+        //     this.comega = 0;
+        // }
+        // if(this.calpha<0.001){
+        //     this.calpha = 0;
+        // }
+        // if(this.cforce<0.04){
+        //     this.cforce = 0;
+        // }
         
     }
+
+    // friction(){
+        
+    // }
 
     dynamics(){
-        this.cfAngle = this.cAngle + this.steerAngle;
-        this.ctor=0;
+        this.sH = this.cH.rot(-this.steerAngle);
         
-        let angleH = wrap(this.cAngle-Math.atan2(-this.cvelx,-this.cvely)) 
-        let angleS = wrap(this.cfAngle-Math.atan2(-this.cvelx,-this.cvely)) 
-        let mag = (this.cvelx**2 + this.cvely**2)**0.5
-        this.cveld = (mag) * Math.cos(angleH)
-        if(this.steerAngle!=0){
-            this.r = this.clength/Math.tan(Math.abs(this.steerAngle)) + this.width/2
-            this.ctor += Math.abs(this.cveld**1)/this.r * Math.sign(this.steerAngle);
-            
-        }
-        // this.cf+=0.03*this.cveld
-        // this.cf=(Math.min(Math.abs(this.cf),this.maxcf)) * Math.sign(this.cf);
-        this.cfx = -(this.cf)*Math.sin(this.cfAngle) - 0.05*this.cvelx;
-        this.cfy = -(this.cf)*Math.cos(this.cfAngle) - 0.05*this.cvely;
-        // this.cvelx = this.cvelx*Math.cos(angleS) - this.cvely*Math.sin(angleS);
-        // this.cvely = this.cvelx*Math.sin(angleS) + this.cvely*Math.cos(angleS);
+        this.cfricf = ((this.cvel.proj(this.sH)).unit().scale(this.rfric)).add((this.cvel.perp(this.sH)).unit().scale(this.sfric));
+        this.cfricr = ((this.cvel.proj(this.cH)).unit().scale(this.rfric)).add((this.cvel.perp(this.cH)).unit().scale(this.sfric));
+        
+        this.ctor = 0;
+        this.ctor -= this.cfricf.mag()*this.clength*0.5*Math.sin(this.cfricf.angdiff(this.cH));
+        this.ctor -= this.cfricr.mag()*this.clength*0.5*Math.sin(this.cfricr.angdiff(this.cH));
+        this.ctor -= this.cforce.mag()*this.clength*0.5*Math.sin(this.cforce.angdiff(this.cH));
+        this.ctor -= this.comega*50;
+        this.cforce = (this.cforce.add(this.cfricf)).add(this.cfricr);
+        // console.log("force", this.cforce, "front fric", this.cfricf, "rear fric", this.cfricr);
     }
 
     move(){
-        this.caccx=this.cfx/this.cmass;
-        this.caccy=this.cfy/this.cmass;
-        this.cvelx += this.caccx;
-        this.cvely += this.caccy;
-        if((this.cvelx**2 + this.cvely**2)<0.001){this.cvelx=0; this.cvely=0}
-        this.cx+=this.cvelx;
-        this.cy+=this.cvely;
-        this.calpha=this.ctor/this.cmoi;
-        this.calpha-=0.1*this.comega;
-        this.comega+=this.calpha;
-        this.cAngle+=this.comega;
-        this.cAngle = wrap(this.cAngle)
+        this.cacc = this.cforce.scale(1/this.cmass);
+        this.cvel = this.cvel.add(this.cacc.scale(1/fps));
+        
+        this.calpha = this.ctor * (1/this.cmoi);
+        this.comega += this.calpha * (1/fps);
+
+        // this.saturate();
+
+        this.cx += this.cvel.x * (1/fps);
+        this.cy += this.cvel.y * (1/fps);
+        this.cH = this.cH.rot(this.comega * (1/fps));
+        this.cAngle = this.cH.ang();
     }
 
     updateTrailer(){
@@ -203,29 +242,28 @@ class Truck{
         ctx.arc(this.mx, this.my, 5, 0, 2 * Math.PI);
         ctx.fillStyle = "red";
         ctx.fill();
+
+        ctx.beginPath();
+        ctx.moveTo(100, 100);
+        ctx.lineTo(100+(this.sH.x)*30, 100+(this.sH.y)*30);
+        ctx.moveTo(100, 200);
+        ctx.lineTo(100+(this.cH.x)*30, 200+(this.cH.y)*30);
+        ctx.moveTo(100, 100);
+        ctx.lineTo(100+(this.cvel.x)*30, 100+(this.cvel.y)*30);
+        ctx.moveTo(100, 100);
+        ctx.lineTo(100+(this.cvel.proj(this.sH).x)*30, 100+(this.cvel.proj(this.sH).y)*30);
+        ctx.moveTo(100, 100);
+        ctx.lineTo(100+(this.cvel.perp(this.sH).x)*30, 100+(this.cvel.perp(this.sH).y)*30);
+        ctx.moveTo(100, 400);
+        ctx.lineTo(100+(this.cfricf.x)*2000, 400+(this.cfricf.y)*2000);
+        ctx.moveTo(100, 400);
+        ctx.lineTo(100+(this.cvel.x)*2000, 400+(this.cvel.y)*2000);
+        ctx.moveTo(100, 500);
+        ctx.lineTo(100+(this.cfricr.x)*2000, 500+(this.cfricr.y)*2000);
+        ctx.moveTo(100, 0);
+        ctx.lineTo(100, 1000);
+        ctx.stroke();
     }
 }
 
-// initialize vectors
 
-// vehicle head unit
-// steer head unit
-// steer angle unit
-// f
-// a
-// v
-
-// a = 0
-// sh = vh + sa
-// forward
-// f += sh * k1
-
-
-// fsh -= v perp sh  * k2
-// fsh -= v proj sh  * k3
-
-// fvh -= v proj vh  * k3
-// fvh -= v perp vh  * k2
-
-// ang = angdiff fsh vh
-// fsh * wb/2 * sin(angdiff)

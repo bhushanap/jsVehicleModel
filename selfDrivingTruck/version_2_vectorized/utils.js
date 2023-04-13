@@ -16,3 +16,4 @@ function fricA(headA, velA){
         return wrap(headA+(Math.PI/2))
     }
 }
+

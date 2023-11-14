@@ -6,14 +6,14 @@ class Car{
         this.height=height;
 
         this.spd=0;
-        this.acc=0.07;
-        this.racc=0.02;
+        this.acc=0.03;
+        this.racc=0.01;
         this.dir=1;
-        this.maxspd=this.height/2;
+        this.maxspd=this.height/25;
         this.frc=0;
         this.maxangle=0.5;
         this.angle=0;
-        this.steer=0.04;
+        this.steer=0.001;
         this.carAngle=0;
         this.carSteer=0;
         this.maxCarSteer=0.04;

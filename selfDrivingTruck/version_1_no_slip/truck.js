@@ -23,7 +23,7 @@ class Truck{
         this.fAngle = this.cAngle+this.steerAngle;
 
         this.maxfric=0.01;
-        this.maxcf=0.05;
+        this.maxcf=0.04;
         this.dcf=0.002;
         this.cf=0;
         this.cacc=0;

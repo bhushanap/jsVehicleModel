@@ -71,8 +71,8 @@ class Sensors{
                                 );  
             const rayAngle=relAngle  + this.car.carAngle;
             const start={x: this.car.x,y:this.car.y};
-            const end={x:this.car.x-this.rayLength*Math.sin(rayAngle)*Math.cos(relAngle*Math.PI/this.raySpread*0.8),
-                        y:this.car.y-this.rayLength*Math.cos(rayAngle)*Math.cos(relAngle*Math.PI/this.raySpread*0.8)};
+            const end={x:this.car.x-this.rayLength*Math.sin(rayAngle)*Math.cos(relAngle*Math.PI/this.raySpread*0.7),
+                        y:this.car.y-this.rayLength*Math.cos(rayAngle)*Math.cos(relAngle*Math.PI/this.raySpread*0.7)};
             this.rays.push([start,end]);
         }
     }

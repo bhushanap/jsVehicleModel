@@ -6,7 +6,7 @@ class Car{
         this.height=height;
 
         this.spd=0;
-        this.acc=0.01;
+        this.acc=0.1;
         this.racc=0.002;
         this.dir=1;
         this.maxspd=maxspd;
@@ -28,8 +28,8 @@ class Car{
         this.vec=new Vector(this.x,this.y,this.angle,this.width,this.height,this.tirew,this.tirer, controlType);
         this.useBrain=controlType=='AI';
         if(controlType!='DUMMY'){
-            this.sensor=new Sensors(this, 7, Math.PI/3, 250);
-            this.brain=new NeuralNetwork([7,5,5,3]);
+            this.sensor=new Sensors(this, 11, Math.PI/2, 250);
+            this.brain=new NeuralNetwork([11,7,7,3]);
         }
         this.damaged=false;
 
@@ -176,7 +176,7 @@ class Car{
         }
     }
 
-    draw(ctx){
+    draw(ctx,color,drawSensor){
         // ctx.save();
         // ctx.translate(this.x,this.y)
         // ctx.rotate(-this.carAngle);
@@ -193,7 +193,7 @@ class Car{
             ctx.fillStyle='gray';
         }
         else{
-            ctx.fillStyle='black';
+            ctx.fillStyle=color;
         }
         ctx.beginPath();
         ctx.moveTo(this.polygon[0].x,this.polygon[0].y);
@@ -210,7 +210,7 @@ class Car{
         
         this.vec.draw(ctx);
         ctx.restore();
-        if(this.sensor){
+        if(this.sensor && drawSensor){
             this.sensor.draw(ctx);
         };
         // ctx.restore();

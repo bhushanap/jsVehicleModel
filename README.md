@@ -48,13 +48,14 @@ Another reason for the poor performance is because the network is so basic, it d
 ## ⚙️Running
 
 Clone the repo: `https://github.com/bhushanap/jsVehicleModel`
+
 For:
-**Simulator playground**
-Navigate to: selfDrivingCar/version_latest
-**Road simulator (Manual)**
-Navigate to: selfDrivingCar/version5_Manual
-**Road simulator (AI Agent)**
-Navigate to: selfDrivingCar/version4_AI
+
+**Simulator playground** `Navigate to: selfDrivingCar/version_latest`
+
+**Road simulator (Manual)** `Navigate to: selfDrivingCar/version5_Manual`
+
+**Road simulator (AI Agent)** `Navigate to: selfDrivingCar/version4_AI`
 
 ![carsimnet1](https://github.com/bhushanap/jsVehicleModel/assets/83635464/31fc7165-5733-4a2b-bcb5-c72a0b81a12b)
 

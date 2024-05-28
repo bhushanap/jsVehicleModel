@@ -57,6 +57,6 @@ For:
 
 **Road simulator (AI Agent)** `Navigate to: selfDrivingCar/version4_AI`
 
-![carsimnet1](https://github.com/bhushanap/jsVehicleModel/assets/83635464/31fc7165-5733-4a2b-bcb5-c72a0b81a12b)
+![carsimnet1](carsimnet1.gif)
 
 Open: index.html in a JS compatible browser to launch the demo

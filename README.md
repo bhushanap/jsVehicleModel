@@ -20,6 +20,7 @@ The goal of this project is to develop an autonomous reinforcement learning agen
 ## 🚧Work Done
 
 The background was setup using basic HTML and CSS canvas. On this, using CSS draw methods, the road, its lanes, etc. were made with each declared as its own JavaScript object. The vehicle was modeled with no-slip condition satisfying the Ackermann steering.
+
 ![carmodel1](https://github.com/bhushanap/jsVehicleModel/assets/83635464/55399f1f-faa2-41e1-819e-f2d330ca222c)
 
 The car has 3 basic input parameters:
